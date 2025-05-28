@@ -112,10 +112,13 @@ def main():
 
     if args.start:
         print("Starting matrix multiply...")
+        start = time.perf_counter()
         start_matmul(ser)
         print("Start command sent.")
 
     ser.close()
+    end = time.perf_counter()
+    print(f"FPGA Time: {(end - start) * 1000} ms")
     print("Done.")
 
 if __name__ == "__main__":
