@@ -16,18 +16,6 @@ VL_INLINE_OPT void Vlayer_top___024root___nba_sequent__TOP__0(Vlayer_top___024ro
     Vlayer_top__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vlayer_top___024root___nba_sequent__TOP__0\n"); );
     // Init
-    SData/*9:0*/ __Vdlyvdim0__layer_top__DOT__token_mem__DOT__mem__v0;
-    __Vdlyvdim0__layer_top__DOT__token_mem__DOT__mem__v0 = 0;
-    SData/*15:0*/ __Vdlyvval__layer_top__DOT__token_mem__DOT__mem__v0;
-    __Vdlyvval__layer_top__DOT__token_mem__DOT__mem__v0 = 0;
-    CData/*0:0*/ __Vdlyvset__layer_top__DOT__token_mem__DOT__mem__v0;
-    __Vdlyvset__layer_top__DOT__token_mem__DOT__mem__v0 = 0;
-    SData/*9:0*/ __Vdlyvdim0__layer_top__DOT__weight_mem__DOT__mem__v0;
-    __Vdlyvdim0__layer_top__DOT__weight_mem__DOT__mem__v0 = 0;
-    SData/*15:0*/ __Vdlyvval__layer_top__DOT__weight_mem__DOT__mem__v0;
-    __Vdlyvval__layer_top__DOT__weight_mem__DOT__mem__v0 = 0;
-    CData/*0:0*/ __Vdlyvset__layer_top__DOT__weight_mem__DOT__mem__v0;
-    __Vdlyvset__layer_top__DOT__weight_mem__DOT__mem__v0 = 0;
     SData/*9:0*/ __Vdlyvdim0__layer_top__DOT__result_mem__DOT__mem__v0;
     __Vdlyvdim0__layer_top__DOT__result_mem__DOT__mem__v0 = 0;
     IData/*31:0*/ __Vdlyvval__layer_top__DOT__result_mem__DOT__mem__v0;
@@ -35,39 +23,27 @@ VL_INLINE_OPT void Vlayer_top___024root___nba_sequent__TOP__0(Vlayer_top___024ro
     CData/*0:0*/ __Vdlyvset__layer_top__DOT__result_mem__DOT__mem__v0;
     __Vdlyvset__layer_top__DOT__result_mem__DOT__mem__v0 = 0;
     // Body
-    __Vdlyvset__layer_top__DOT__weight_mem__DOT__mem__v0 = 0U;
-    __Vdlyvset__layer_top__DOT__token_mem__DOT__mem__v0 = 0U;
-    vlSelf->__Vdly__layer_top__DOT__tok_rd_data = vlSelf->layer_top__DOT__tok_rd_data;
-    vlSelf->__Vdly__layer_top__DOT__wgt_rd_data = vlSelf->layer_top__DOT__wgt_rd_data;
+    vlSelf->__Vdlyvset__layer_top__DOT__weight_mem__DOT__mem__v0 = 0U;
+    vlSelf->__Vdlyvset__layer_top__DOT__token_mem__DOT__mem__v0 = 0U;
     __Vdlyvset__layer_top__DOT__result_mem__DOT__mem__v0 = 0U;
     if (vlSelf->weight_wr_en) {
-        __Vdlyvval__layer_top__DOT__weight_mem__DOT__mem__v0 
+        vlSelf->__Vdlyvval__layer_top__DOT__weight_mem__DOT__mem__v0 
             = vlSelf->weight_wr_data;
-        __Vdlyvset__layer_top__DOT__weight_mem__DOT__mem__v0 = 1U;
-        __Vdlyvdim0__layer_top__DOT__weight_mem__DOT__mem__v0 
+        vlSelf->__Vdlyvset__layer_top__DOT__weight_mem__DOT__mem__v0 = 1U;
+        vlSelf->__Vdlyvdim0__layer_top__DOT__weight_mem__DOT__mem__v0 
             = vlSelf->weight_wr_addr;
     }
     if (vlSelf->token_wr_en) {
-        __Vdlyvval__layer_top__DOT__token_mem__DOT__mem__v0 
+        vlSelf->__Vdlyvval__layer_top__DOT__token_mem__DOT__mem__v0 
             = vlSelf->token_wr_data;
-        __Vdlyvset__layer_top__DOT__token_mem__DOT__mem__v0 = 1U;
-        __Vdlyvdim0__layer_top__DOT__token_mem__DOT__mem__v0 
+        vlSelf->__Vdlyvset__layer_top__DOT__token_mem__DOT__mem__v0 = 1U;
+        vlSelf->__Vdlyvdim0__layer_top__DOT__token_mem__DOT__mem__v0 
             = vlSelf->token_wr_addr;
     }
-    if (vlSelf->layer_top__DOT__tok_rd_en) {
-        vlSelf->__Vdly__layer_top__DOT__tok_rd_data 
-            = vlSelf->layer_top__DOT__token_mem__DOT__mem
-            [vlSelf->layer_top__DOT__u_layer_ctrl__DOT__rd_addr_reg];
-    }
-    if (vlSelf->layer_top__DOT__wgt_rd_en) {
-        vlSelf->__Vdly__layer_top__DOT__wgt_rd_data 
-            = vlSelf->layer_top__DOT__weight_mem__DOT__mem
-            [(((IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__neuron_cnt) 
-               << 4U) | (IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__rd_addr_reg))];
-    }
-    if (vlSelf->layer_top__DOT__res_wr_en) {
+    if (vlSelf->layer_top__DOT__u_layer_ctrl__DOT__eov_valid) {
         __Vdlyvval__layer_top__DOT__result_mem__DOT__mem__v0 
-            = vlSelf->layer_top__DOT__res_wr_data;
+            = (vlSelf->layer_top__DOT__u_layer_ctrl__DOT__mac_acc_out 
+               + vlSelf->layer_top__DOT__u_layer_ctrl__DOT__sum_reg);
         __Vdlyvset__layer_top__DOT__result_mem__DOT__mem__v0 = 1U;
         __Vdlyvdim0__layer_top__DOT__result_mem__DOT__mem__v0 
             = vlSelf->layer_top__DOT__u_layer_ctrl__DOT__neuron_cnt;
@@ -75,14 +51,6 @@ VL_INLINE_OPT void Vlayer_top___024root___nba_sequent__TOP__0(Vlayer_top___024ro
     if (vlSelf->result_rd_en) {
         vlSelf->result_rd_data = vlSelf->layer_top__DOT__result_mem__DOT__mem
             [vlSelf->result_rd_addr];
-    }
-    if (__Vdlyvset__layer_top__DOT__token_mem__DOT__mem__v0) {
-        vlSelf->layer_top__DOT__token_mem__DOT__mem[__Vdlyvdim0__layer_top__DOT__token_mem__DOT__mem__v0] 
-            = __Vdlyvval__layer_top__DOT__token_mem__DOT__mem__v0;
-    }
-    if (__Vdlyvset__layer_top__DOT__weight_mem__DOT__mem__v0) {
-        vlSelf->layer_top__DOT__weight_mem__DOT__mem[__Vdlyvdim0__layer_top__DOT__weight_mem__DOT__mem__v0] 
-            = __Vdlyvval__layer_top__DOT__weight_mem__DOT__mem__v0;
     }
     if (__Vdlyvset__layer_top__DOT__result_mem__DOT__mem__v0) {
         vlSelf->layer_top__DOT__result_mem__DOT__mem[__Vdlyvdim0__layer_top__DOT__result_mem__DOT__mem__v0] 
@@ -95,42 +63,29 @@ VL_INLINE_OPT void Vlayer_top___024root___nba_sequent__TOP__1(Vlayer_top___024ro
     Vlayer_top__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vlayer_top___024root___nba_sequent__TOP__1\n"); );
     // Init
-    CData/*2:0*/ __Vdly__layer_top__DOT__u_layer_ctrl__DOT__compute_pipe;
-    __Vdly__layer_top__DOT__u_layer_ctrl__DOT__compute_pipe = 0;
-    CData/*6:0*/ __Vdly__layer_top__DOT__u_layer_ctrl__DOT__eov_pipe;
-    __Vdly__layer_top__DOT__u_layer_ctrl__DOT__eov_pipe = 0;
-    CData/*1:0*/ __Vdly__layer_top__DOT__u_layer_ctrl__DOT__state;
-    __Vdly__layer_top__DOT__u_layer_ctrl__DOT__state = 0;
-    CData/*3:0*/ __Vdly__layer_top__DOT__u_layer_ctrl__DOT__vec_cnt;
-    __Vdly__layer_top__DOT__u_layer_ctrl__DOT__vec_cnt = 0;
-    CData/*2:0*/ __Vdly__layer_top__DOT__u_layer_ctrl__DOT__neuron_cnt;
-    __Vdly__layer_top__DOT__u_layer_ctrl__DOT__neuron_cnt = 0;
     IData/*31:0*/ __Vdly__layer_top__DOT__u_layer_ctrl__DOT__sum_reg;
     __Vdly__layer_top__DOT__u_layer_ctrl__DOT__sum_reg = 0;
+    CData/*2:0*/ __Vdly__layer_top__DOT__u_layer_ctrl__DOT__start_pipe;
+    __Vdly__layer_top__DOT__u_layer_ctrl__DOT__start_pipe = 0;
     // Body
-    __Vdly__layer_top__DOT__u_layer_ctrl__DOT__compute_pipe 
-        = vlSelf->layer_top__DOT__u_layer_ctrl__DOT__compute_pipe;
-    __Vdly__layer_top__DOT__u_layer_ctrl__DOT__eov_pipe 
-        = vlSelf->layer_top__DOT__u_layer_ctrl__DOT__eov_pipe;
+    __Vdly__layer_top__DOT__u_layer_ctrl__DOT__start_pipe 
+        = vlSelf->layer_top__DOT__u_layer_ctrl__DOT__start_pipe;
+    vlSelf->__Vdly__layer_top__DOT__u_layer_ctrl__DOT__neuron_cnt 
+        = vlSelf->layer_top__DOT__u_layer_ctrl__DOT__neuron_cnt;
+    vlSelf->__Vdly__layer_top__DOT__u_layer_ctrl__DOT__read_cnt 
+        = vlSelf->layer_top__DOT__u_layer_ctrl__DOT__read_cnt;
+    vlSelf->__Vdly__layer_top__DOT__u_layer_ctrl__DOT__running 
+        = vlSelf->layer_top__DOT__u_layer_ctrl__DOT__running;
     __Vdly__layer_top__DOT__u_layer_ctrl__DOT__sum_reg 
         = vlSelf->layer_top__DOT__u_layer_ctrl__DOT__sum_reg;
-    __Vdly__layer_top__DOT__u_layer_ctrl__DOT__neuron_cnt 
-        = vlSelf->layer_top__DOT__u_layer_ctrl__DOT__neuron_cnt;
-    __Vdly__layer_top__DOT__u_layer_ctrl__DOT__vec_cnt 
-        = vlSelf->layer_top__DOT__u_layer_ctrl__DOT__vec_cnt;
-    __Vdly__layer_top__DOT__u_layer_ctrl__DOT__state 
-        = vlSelf->layer_top__DOT__u_layer_ctrl__DOT__state;
     if (vlSelf->rst) {
-        __Vdly__layer_top__DOT__u_layer_ctrl__DOT__compute_pipe = 0U;
-        __Vdly__layer_top__DOT__u_layer_ctrl__DOT__eov_pipe = 0U;
-        __Vdly__layer_top__DOT__u_layer_ctrl__DOT__state = 0U;
+        __Vdly__layer_top__DOT__u_layer_ctrl__DOT__start_pipe = 0U;
+        vlSelf->layer_top__DOT__u_layer_ctrl__DOT__eov_pipe = 0U;
+        __Vdly__layer_top__DOT__u_layer_ctrl__DOT__sum_reg = 0U;
+        vlSelf->__Vdly__layer_top__DOT__u_layer_ctrl__DOT__running = 0U;
+        vlSelf->__Vdly__layer_top__DOT__u_layer_ctrl__DOT__read_cnt = 0U;
+        vlSelf->__Vdly__layer_top__DOT__u_layer_ctrl__DOT__neuron_cnt = 0U;
         vlSelf->busy = 0U;
-        __Vdly__layer_top__DOT__u_layer_ctrl__DOT__vec_cnt = 0U;
-        __Vdly__layer_top__DOT__u_layer_ctrl__DOT__neuron_cnt = 0U;
-        vlSelf->layer_top__DOT__u_layer_ctrl__DOT__rd_addr_reg = 0U;
-        vlSelf->layer_top__DOT__tok_rd_en = 0U;
-        vlSelf->layer_top__DOT__wgt_rd_en = 0U;
-        vlSelf->layer_top__DOT__res_wr_en = 0U;
         __Vdly__layer_top__DOT__u_layer_ctrl__DOT__sum_reg = 0U;
         vlSelf->layer_top__DOT__u_layer_ctrl__DOT__mac_acc_out = 0U;
         vlSelf->layer_top__DOT__u_layer_ctrl__DOT__mac_i__DOT__result = 0U;
@@ -142,65 +97,37 @@ VL_INLINE_OPT void Vlayer_top___024root___nba_sequent__TOP__1(Vlayer_top___024ro
         vlSelf->layer_top__DOT__u_layer_ctrl__DOT__token_pipe = 0U;
         vlSelf->layer_top__DOT__u_layer_ctrl__DOT__weight_pipe = 0U;
     } else {
-        __Vdly__layer_top__DOT__u_layer_ctrl__DOT__compute_pipe 
-            = ((6U & ((IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__compute_pipe) 
-                      << 1U)) | (1U == (IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__state)));
-        __Vdly__layer_top__DOT__u_layer_ctrl__DOT__eov_pipe 
+        __Vdly__layer_top__DOT__u_layer_ctrl__DOT__start_pipe 
+            = ((6U & ((IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__start_pipe) 
+                      << 1U)) | (IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__running));
+        vlSelf->layer_top__DOT__u_layer_ctrl__DOT__eov_pipe 
             = ((0x7eU & ((IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__eov_pipe) 
-                         << 1U)) | ((1U == (IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__state)) 
-                                    & (0xfU == (IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__vec_cnt))));
-        if ((2U & (IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__state))) {
-            if ((1U & (IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__state))) {
-                vlSelf->busy = 0U;
-                if ((1U & (~ (IData)(vlSelf->start)))) {
-                    __Vdly__layer_top__DOT__u_layer_ctrl__DOT__state = 0U;
-                }
-            } else {
-                vlSelf->layer_top__DOT__tok_rd_en = 0U;
-                vlSelf->layer_top__DOT__wgt_rd_en = 0U;
-                vlSelf->layer_top__DOT__res_wr_en = 0U;
-                if ((7U == (IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__neuron_cnt))) {
-                    __Vdly__layer_top__DOT__u_layer_ctrl__DOT__state = 3U;
+                         << 1U)) | ((IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__running) 
+                                    & (0xfU == (IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__read_cnt))));
+        if (vlSelf->layer_top__DOT__u_layer_ctrl__DOT__mac_valid) {
+            __Vdly__layer_top__DOT__u_layer_ctrl__DOT__sum_reg 
+                = (vlSelf->layer_top__DOT__u_layer_ctrl__DOT__sum_reg 
+                   + vlSelf->layer_top__DOT__u_layer_ctrl__DOT__mac_acc_out);
+        }
+        if (vlSelf->start) {
+            vlSelf->__Vdly__layer_top__DOT__u_layer_ctrl__DOT__running = 1U;
+            vlSelf->__Vdly__layer_top__DOT__u_layer_ctrl__DOT__read_cnt = 0U;
+            vlSelf->__Vdly__layer_top__DOT__u_layer_ctrl__DOT__neuron_cnt = 0U;
+            vlSelf->busy = 1U;
+            __Vdly__layer_top__DOT__u_layer_ctrl__DOT__sum_reg = 0U;
+        } else if (vlSelf->layer_top__DOT__u_layer_ctrl__DOT__running) {
+            vlSelf->__Vdly__layer_top__DOT__u_layer_ctrl__DOT__read_cnt 
+                = ((0xfU == (IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__read_cnt))
+                    ? 0U : (0xfU & ((IData)(1U) + (IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__read_cnt))));
+            if (vlSelf->layer_top__DOT__u_layer_ctrl__DOT__eov_valid) {
+                if ((0xfU == (IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__neuron_cnt))) {
+                    vlSelf->__Vdly__layer_top__DOT__u_layer_ctrl__DOT__running = 0U;
+                    vlSelf->busy = 0U;
                 } else {
-                    __Vdly__layer_top__DOT__u_layer_ctrl__DOT__neuron_cnt 
-                        = (7U & ((IData)(1U) + (IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__neuron_cnt)));
-                    __Vdly__layer_top__DOT__u_layer_ctrl__DOT__state = 1U;
-                    __Vdly__layer_top__DOT__u_layer_ctrl__DOT__vec_cnt = 0U;
-                    vlSelf->layer_top__DOT__u_layer_ctrl__DOT__rd_addr_reg = 0U;
+                    vlSelf->__Vdly__layer_top__DOT__u_layer_ctrl__DOT__neuron_cnt 
+                        = (0xfU & ((IData)(1U) + (IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__neuron_cnt)));
                     __Vdly__layer_top__DOT__u_layer_ctrl__DOT__sum_reg = 0U;
                 }
-            }
-        } else if ((1U & (IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__state))) {
-            vlSelf->layer_top__DOT__tok_rd_en = 1U;
-            vlSelf->layer_top__DOT__wgt_rd_en = 1U;
-            vlSelf->layer_top__DOT__u_layer_ctrl__DOT__rd_addr_reg 
-                = vlSelf->layer_top__DOT__u_layer_ctrl__DOT__vec_cnt;
-            if (vlSelf->layer_top__DOT__u_layer_ctrl__DOT__mac_valid) {
-                if ((0x40U & (IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__eov_pipe))) {
-                    vlSelf->layer_top__DOT__res_wr_en = 1U;
-                    vlSelf->layer_top__DOT__res_wr_data 
-                        = (vlSelf->layer_top__DOT__u_layer_ctrl__DOT__sum_reg 
-                           + vlSelf->layer_top__DOT__u_layer_ctrl__DOT__mac_acc_out);
-                    __Vdly__layer_top__DOT__u_layer_ctrl__DOT__state = 2U;
-                    __Vdly__layer_top__DOT__u_layer_ctrl__DOT__sum_reg = 0U;
-                } else {
-                    __Vdly__layer_top__DOT__u_layer_ctrl__DOT__sum_reg 
-                        = (vlSelf->layer_top__DOT__u_layer_ctrl__DOT__sum_reg 
-                           + vlSelf->layer_top__DOT__u_layer_ctrl__DOT__mac_acc_out);
-                }
-            }
-            __Vdly__layer_top__DOT__u_layer_ctrl__DOT__vec_cnt 
-                = ((0xfU == (IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__vec_cnt))
-                    ? 0U : (0xfU & ((IData)(1U) + (IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__vec_cnt))));
-        } else {
-            vlSelf->busy = 0U;
-            if (vlSelf->start) {
-                vlSelf->busy = 1U;
-                __Vdly__layer_top__DOT__u_layer_ctrl__DOT__state = 1U;
-                __Vdly__layer_top__DOT__u_layer_ctrl__DOT__vec_cnt = 0U;
-                __Vdly__layer_top__DOT__u_layer_ctrl__DOT__neuron_cnt = 0U;
-                vlSelf->layer_top__DOT__u_layer_ctrl__DOT__rd_addr_reg = 0U;
-                __Vdly__layer_top__DOT__u_layer_ctrl__DOT__sum_reg = 0U;
             }
         }
         vlSelf->layer_top__DOT__u_layer_ctrl__DOT__mac_acc_out 
@@ -213,43 +140,36 @@ VL_INLINE_OPT void Vlayer_top___024root___nba_sequent__TOP__1(Vlayer_top___024ro
         vlSelf->layer_top__DOT__u_layer_ctrl__DOT__mac_i__DOT__mult_result 
             = VL_MULS_III(32, VL_EXTENDS_II(32,16, (IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__mac_i__DOT__a_reg)), 
                           VL_EXTENDS_II(32,16, (IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__mac_i__DOT__b_reg)));
-        if ((4U & (IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__compute_pipe))) {
+        if ((4U & (IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__start_pipe))) {
             vlSelf->layer_top__DOT__u_layer_ctrl__DOT__mac_i__DOT__acc_reg = 0U;
             vlSelf->layer_top__DOT__u_layer_ctrl__DOT__mac_i__DOT__a_reg 
                 = vlSelf->layer_top__DOT__u_layer_ctrl__DOT__token_pipe;
             vlSelf->layer_top__DOT__u_layer_ctrl__DOT__mac_i__DOT__b_reg 
                 = vlSelf->layer_top__DOT__u_layer_ctrl__DOT__weight_pipe;
         }
-        if ((1U == (IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__state))) {
-            vlSelf->layer_top__DOT__u_layer_ctrl__DOT__token_pipe 
-                = vlSelf->layer_top__DOT__tok_rd_data;
-            vlSelf->layer_top__DOT__u_layer_ctrl__DOT__weight_pipe 
-                = vlSelf->layer_top__DOT__wgt_rd_data;
-        }
+        vlSelf->layer_top__DOT__u_layer_ctrl__DOT__token_pipe 
+            = vlSelf->layer_top__DOT__tok_rd_data;
+        vlSelf->layer_top__DOT__u_layer_ctrl__DOT__weight_pipe 
+            = vlSelf->layer_top__DOT__wgt_rd_data;
     }
     vlSelf->layer_top__DOT__u_layer_ctrl__DOT__sum_reg 
         = __Vdly__layer_top__DOT__u_layer_ctrl__DOT__sum_reg;
-    vlSelf->layer_top__DOT__u_layer_ctrl__DOT__vec_cnt 
-        = __Vdly__layer_top__DOT__u_layer_ctrl__DOT__vec_cnt;
-    vlSelf->layer_top__DOT__u_layer_ctrl__DOT__eov_pipe 
-        = __Vdly__layer_top__DOT__u_layer_ctrl__DOT__eov_pipe;
-    vlSelf->layer_top__DOT__u_layer_ctrl__DOT__neuron_cnt 
-        = __Vdly__layer_top__DOT__u_layer_ctrl__DOT__neuron_cnt;
     vlSelf->layer_top__DOT__u_layer_ctrl__DOT__mac_valid 
         = ((1U & (~ (IData)(vlSelf->rst))) && (IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__mac_i__DOT__stage3_valid));
+    vlSelf->done = (1U & (~ (IData)(vlSelf->busy)));
+    vlSelf->layer_top__DOT__u_layer_ctrl__DOT__eov_valid 
+        = (((IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__eov_pipe) 
+            >> 6U) & (IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__mac_valid));
     vlSelf->layer_top__DOT__u_layer_ctrl__DOT__mac_i__DOT__stage3_valid 
         = ((1U & (~ (IData)(vlSelf->rst))) && (IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__mac_i__DOT__stage2_valid));
     vlSelf->layer_top__DOT__u_layer_ctrl__DOT__mac_i__DOT__stage2_valid 
         = ((1U & (~ (IData)(vlSelf->rst))) && (IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__mac_i__DOT__stage1_valid));
     vlSelf->layer_top__DOT__u_layer_ctrl__DOT__mac_i__DOT__stage1_valid 
         = ((1U & (~ (IData)(vlSelf->rst))) && (1U & 
-                                               ((IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__compute_pipe) 
+                                               ((IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__start_pipe) 
                                                 >> 2U)));
-    vlSelf->layer_top__DOT__u_layer_ctrl__DOT__compute_pipe 
-        = __Vdly__layer_top__DOT__u_layer_ctrl__DOT__compute_pipe;
-    vlSelf->layer_top__DOT__u_layer_ctrl__DOT__state 
-        = __Vdly__layer_top__DOT__u_layer_ctrl__DOT__state;
-    vlSelf->done = (3U == (IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__state));
+    vlSelf->layer_top__DOT__u_layer_ctrl__DOT__start_pipe 
+        = __Vdly__layer_top__DOT__u_layer_ctrl__DOT__start_pipe;
 }
 
 VL_INLINE_OPT void Vlayer_top___024root___nba_sequent__TOP__2(Vlayer_top___024root* vlSelf) {
@@ -257,8 +177,34 @@ VL_INLINE_OPT void Vlayer_top___024root___nba_sequent__TOP__2(Vlayer_top___024ro
     Vlayer_top__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vlayer_top___024root___nba_sequent__TOP__2\n"); );
     // Body
-    vlSelf->layer_top__DOT__tok_rd_data = vlSelf->__Vdly__layer_top__DOT__tok_rd_data;
-    vlSelf->layer_top__DOT__wgt_rd_data = vlSelf->__Vdly__layer_top__DOT__wgt_rd_data;
+    if (vlSelf->layer_top__DOT__u_layer_ctrl__DOT__running) {
+        vlSelf->layer_top__DOT__tok_rd_data = vlSelf->layer_top__DOT__token_mem__DOT__mem
+            [vlSelf->layer_top__DOT__u_layer_ctrl__DOT__read_cnt];
+        vlSelf->layer_top__DOT__wgt_rd_data = vlSelf->layer_top__DOT__weight_mem__DOT__mem
+            [(((IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__neuron_cnt) 
+               << 4U) | (IData)(vlSelf->layer_top__DOT__u_layer_ctrl__DOT__read_cnt))];
+    }
+    if (vlSelf->__Vdlyvset__layer_top__DOT__token_mem__DOT__mem__v0) {
+        vlSelf->layer_top__DOT__token_mem__DOT__mem[vlSelf->__Vdlyvdim0__layer_top__DOT__token_mem__DOT__mem__v0] 
+            = vlSelf->__Vdlyvval__layer_top__DOT__token_mem__DOT__mem__v0;
+    }
+    if (vlSelf->__Vdlyvset__layer_top__DOT__weight_mem__DOT__mem__v0) {
+        vlSelf->layer_top__DOT__weight_mem__DOT__mem[vlSelf->__Vdlyvdim0__layer_top__DOT__weight_mem__DOT__mem__v0] 
+            = vlSelf->__Vdlyvval__layer_top__DOT__weight_mem__DOT__mem__v0;
+    }
+}
+
+VL_INLINE_OPT void Vlayer_top___024root___nba_sequent__TOP__3(Vlayer_top___024root* vlSelf) {
+    if (false && vlSelf) {}  // Prevent unused
+    Vlayer_top__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
+    VL_DEBUG_IF(VL_DBG_MSGF("+    Vlayer_top___024root___nba_sequent__TOP__3\n"); );
+    // Body
+    vlSelf->layer_top__DOT__u_layer_ctrl__DOT__neuron_cnt 
+        = vlSelf->__Vdly__layer_top__DOT__u_layer_ctrl__DOT__neuron_cnt;
+    vlSelf->layer_top__DOT__u_layer_ctrl__DOT__read_cnt 
+        = vlSelf->__Vdly__layer_top__DOT__u_layer_ctrl__DOT__read_cnt;
+    vlSelf->layer_top__DOT__u_layer_ctrl__DOT__running 
+        = vlSelf->__Vdly__layer_top__DOT__u_layer_ctrl__DOT__running;
 }
 
 void Vlayer_top___024root___eval_nba(Vlayer_top___024root* vlSelf) {
@@ -275,6 +221,10 @@ void Vlayer_top___024root___eval_nba(Vlayer_top___024root* vlSelf) {
     }
     if ((1ULL & vlSelf->__VnbaTriggered.word(0U))) {
         Vlayer_top___024root___nba_sequent__TOP__2(vlSelf);
+    }
+    if ((2ULL & vlSelf->__VnbaTriggered.word(0U))) {
+        Vlayer_top___024root___nba_sequent__TOP__3(vlSelf);
+        vlSelf->__Vm_traceActivity[2U] = 1U;
     }
 }
 

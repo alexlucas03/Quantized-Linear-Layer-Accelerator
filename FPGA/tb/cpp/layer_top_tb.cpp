@@ -27,7 +27,7 @@ static int32_t to_fixed(double v) {
 }
 
 const int VECTOR_LEN = 16;  // Length of input vector
-const int NUM_NEURONS = 8;   // Number of neurons in the layer
+const int NUM_NEURONS = 16;   // Number of neurons in the layer
 
 int main(int argc, char** argv) {
     Verilated::commandArgs(argc, argv);
@@ -55,7 +55,7 @@ int main(int argc, char** argv) {
     for (int addr = 0; addr < VECTOR_LEN; addr++) {
         dut->token_wr_en   = 1;
         dut->token_wr_addr = addr;
-        dut->token_wr_data = to_fixed(1.0);
+        dut->token_wr_data = to_fixed(addr);
         tick(dut, tfp);
     }
     dut->token_wr_en = 0;
@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
     for (int addr = 0; addr < VECTOR_LEN * NUM_NEURONS; addr++) {
         dut->weight_wr_en   = 1;
         dut->weight_wr_addr = addr;
-        dut->weight_wr_data = to_fixed(1.0);
+        dut->weight_wr_data = to_fixed(4.0);
         tick(dut, tfp);
     }
     dut->weight_wr_en = 0;
@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
 
     // Read and verify results for each neuron
     bool all_ok = true;
-    const int32_t expected = VECTOR_LEN * to_fixed(1.0);  // VECTOR_LEN * 1.0
+    const int32_t expected = (VECTOR_LEN * (VECTOR_LEN - 1))/2 * to_fixed(4.0);  // VECTOR_LEN * 1.0
     for (int n = 0; n < NUM_NEURONS; n++) {
         dut->result_rd_en   = 1;
         dut->result_rd_addr = n;

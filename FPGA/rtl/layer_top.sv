@@ -2,7 +2,7 @@ module layer_top #(
     parameter ADDR_WIDTH   = 10,
     parameter DATA_WIDTH   = 16,
     parameter VECTOR_LEN   = 16,
-    parameter NUM_NEURONS  = 8
+    parameter NUM_NEURONS  = 16
 )(
     input  logic                      clk,
     input  logic                      rst,
