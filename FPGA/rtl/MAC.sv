@@ -36,6 +36,7 @@ module MAC #(
             mult_result   <= '0;
             acc_stage2    <= '0;
             stage2_valid  <= 0;
+            stage3_valid  <= 0;
 
             result        <= '0;
             acc_out       <= '0;

@@ -26,13 +26,16 @@ static int32_t to_fixed(double v) {
     return int32_t(v * (1 << Q));
 }
 
+const int VECTOR_LEN = 16;  // Length of input vector
+const int NUM_NEURONS = 8;   // Number of neurons in the layer
+
 int main(int argc, char** argv) {
     Verilated::commandArgs(argc, argv);
     Verilated::traceEverOn(true);
     Vlayer_top* dut = new Vlayer_top;
 
     VerilatedVcdC* tfp = new VerilatedVcdC;
-    dut->trace(tfp, 5);
+    dut->trace(tfp, 2);
     tfp->open("sim/vcd/layer_top_tb.vcd");
 
     // Initialize inputs
@@ -48,8 +51,8 @@ int main(int argc, char** argv) {
     dut->rst = 0;
     tick(dut, tfp);
 
-    // Write token memory: set all tokens to 1.0
-    for (int addr = 0; addr < 32; addr++) {
+    // Write token memory: set all tokens to addr
+    for (int addr = 0; addr < VECTOR_LEN; addr++) {
         dut->token_wr_en   = 1;
         dut->token_wr_addr = addr;
         dut->token_wr_data = to_fixed(1.0);
@@ -59,7 +62,7 @@ int main(int argc, char** argv) {
     tick(dut, tfp);
 
     // Write weight memory: set all weights to 1.0
-    for (int addr = 0; addr < 32*32; addr++) {
+    for (int addr = 0; addr < VECTOR_LEN * NUM_NEURONS; addr++) {
         dut->weight_wr_en   = 1;
         dut->weight_wr_addr = addr;
         dut->weight_wr_data = to_fixed(1.0);
@@ -74,14 +77,20 @@ int main(int argc, char** argv) {
     dut->start = 0;
 
     // Wait until done
-    while (!dut->done && !Verilated::gotFinish()) {
+    int max_ticks = 1000;  // or another reasonable upper bound
+    int tick_count = 0;
+    while (!dut->done && !Verilated::gotFinish() && tick_count < max_ticks) {
         tick(dut, tfp);
+        tick_count++;
+    }
+    if (tick_count >= max_ticks) {
+        std::cout << "ERROR: Simulation timed out waiting for done signal.\n";
     }
 
     // Read and verify results for each neuron
     bool all_ok = true;
-    const int32_t expected = 32 * to_fixed(1.0);  // VECTOR_LEN * 1.0
-    for (int n = 0; n < 32; n++) {
+    const int32_t expected = VECTOR_LEN * to_fixed(1.0);  // VECTOR_LEN * 1.0
+    for (int n = 0; n < NUM_NEURONS; n++) {
         dut->result_rd_en   = 1;
         dut->result_rd_addr = n;
         tick(dut, tfp);

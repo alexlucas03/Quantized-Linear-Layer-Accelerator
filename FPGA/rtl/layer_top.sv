@@ -1,9 +1,8 @@
-module top_level #(
+module layer_top #(
     parameter ADDR_WIDTH   = 10,
     parameter DATA_WIDTH   = 16,
-    parameter VECTOR_LEN   = 32,
-    parameter NUM_NEURONS  = 32,
-    parameter PIPE_LATENCY = 2
+    parameter VECTOR_LEN   = 16,
+    parameter NUM_NEURONS  = 8
 )(
     input  logic                      clk,
     input  logic                      rst,
@@ -92,21 +91,22 @@ module top_level #(
         .DATA_WIDTH(DATA_WIDTH),
         .VECTOR_LEN(VECTOR_LEN),
         .NUM_NEURONS(NUM_NEURONS),
-        .PIPE_LATENCY(PIPE_LATENCY)
+        .BRAM_LATENCY(),  // BRAM latency
+        .MAC_LATENCY()     // MAC latency
     ) u_layer_ctrl (
         .clk           (clk),
         .rst           (rst),
         .start         (start),
         .busy          (busy),
-        .tok_rd_en     (tok_rd_en),
-        .tok_rd_addr   (tok_rd_addr),
-        .tok_rd_data   (tok_rd_data),
-        .wgt_rd_en     (wgt_rd_en),
-        .wgt_rd_addr   (wgt_rd_addr),
-        .wgt_rd_data   (wgt_rd_data),
-        .res_wr_en     (res_wr_en),
-        .res_wr_addr   (res_wr_addr),
-        .res_wr_data   (res_wr_data),
+        .token_rd_en     (tok_rd_en),
+        .token_rd_addr   (tok_rd_addr),
+        .token_rd_data   (tok_rd_data),
+        .weight_rd_en     (wgt_rd_en),
+        .weight_rd_addr   (wgt_rd_addr),
+        .weight_rd_data   (wgt_rd_data),
+        .result_wr_en     (res_wr_en),
+        .result_wr_addr   (res_wr_addr),
+        .result_wr_data   (res_wr_data),
         .done          (done)
     );
 

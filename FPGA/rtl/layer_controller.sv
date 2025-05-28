@@ -1,123 +1,139 @@
+//------------------------------------------------------------------------------
+// layer_controller_external_accum.sv
+// Performs layer inference by streaming products from a pipelined MAC
+// and summing them externally into a simple accumulator register.
+//------------------------------------------------------------------------------
 module layer_controller #(
-  parameter ADDR_WIDTH    = 10,
-  parameter DATA_WIDTH    = 16,
-  parameter VECTOR_LEN    = 512,
-  parameter NUM_NEURONS   = 512,
-  // Pipeline latency of MAC (cycles from .start to .valid)
-  parameter PIPE_LATENCY  = 2
+    parameter ADDR_WIDTH    = 10,
+    parameter DATA_WIDTH    = 16,
+    parameter VECTOR_LEN    = 16,
+    parameter NUM_NEURONS   = 8,
+    parameter BRAM_LATENCY  = 3,
+    parameter MAC_LATENCY   = 4
 )(
-  input  logic                            clk,
-  input  logic                            rst,
-  input  logic                            start,
-  output logic                            busy,
+    input  logic                        clk,
+    input  logic                        rst,
+    input  logic                        start,
+    output logic                        busy,
+    output logic                        done,
 
-  // Token BRAM read port
-  output logic                            tok_rd_en,
-  output logic [ADDR_WIDTH-1:0]           tok_rd_addr,
-  input  logic [DATA_WIDTH-1:0]           tok_rd_data,
+    // Token & Weight BRAM interfaces
+    output logic                        token_rd_en,
+    output logic [ADDR_WIDTH-1:0]       token_rd_addr,
+    input  logic [DATA_WIDTH-1:0]       token_rd_data,
+    output logic                        weight_rd_en,
+    output logic [ADDR_WIDTH-1:0]       weight_rd_addr,
+    input  logic [DATA_WIDTH-1:0]       weight_rd_data,
 
-  // Weight BRAM read port
-  output logic                            wgt_rd_en,
-  output logic [ADDR_WIDTH-1:0]           wgt_rd_addr,
-  input  logic [DATA_WIDTH-1:0]           wgt_rd_data,
-
-  // Result write-back
-  output logic                            res_wr_en,
-  output logic [ADDR_WIDTH-1:0]           res_wr_addr,
-  output logic signed [2*DATA_WIDTH-1:0]  res_wr_data,
-
-  output logic                            done
+    // Result BRAM interface
+    output logic                        result_wr_en,
+    output logic [ADDR_WIDTH-1:0]       result_wr_addr,
+    output logic signed [2*DATA_WIDTH-1:0] result_wr_data
 );
 
-  // Pointers
-  logic [$clog2(VECTOR_LEN):0]  elem_idx;
-  logic [$clog2(NUM_NEURONS):0] neuron_idx;
+    localparam VECTOR_AW    = $clog2(VECTOR_LEN);
+    localparam NEURON_AW    = $clog2(NUM_NEURONS);
+    localparam TOTAL_LATENCY = BRAM_LATENCY + MAC_LATENCY;
+    assign done = (state==DONE);
+    
+    typedef enum logic [1:0] {IDLE, COMPUTE, WRITE, DONE} state_t;
+    state_t state;
 
-  // MAC interface
-  logic                            mac_start;
-  logic signed [DATA_WIDTH-1:0]    mac_a, mac_b;
-  logic signed [2*DATA_WIDTH-1:0]  mac_acc_in, mac_acc_out;
-  logic                            mac_valid;
+    logic [VECTOR_AW-1:0] vec_cnt;
+    logic [NEURON_AW-1:0] neuron_cnt;
+    logic [VECTOR_AW-1:0] rd_addr_reg;
 
-  // Instantiate pipelined MAC
-  MAC #(.WIDTH(DATA_WIDTH)) mac_inst (
-    .clk    (clk),
-    .rst    (rst),
-    .start  (mac_start),
-    .a      (mac_a),
-    .b      (mac_b),
-    .acc_in (mac_acc_in),
-    .acc_out(mac_acc_out),
-    .valid  (mac_valid)
-  );
+    logic [BRAM_LATENCY-1:0] compute_pipe;
+    logic [TOTAL_LATENCY-1:0] eov_pipe;
+    logic mac_start, eov_valid;
 
-  // Shift registers to align start→valid and acc feedback
-  logic [PIPE_LATENCY:0]                  start_pipe;
-  logic [PIPE_LATENCY:0]                  valid_pipe;
-  logic signed [2*DATA_WIDTH-1:0]        acc_pipe [0:PIPE_LATENCY];
+    logic signed [DATA_WIDTH-1:0] token_pipe, weight_pipe;
+    logic signed [2*DATA_WIDTH-1:0] mac_acc_out;
+    logic mac_valid;
 
-  // Controls
-  assign busy       = !done;
-  assign res_wr_en  = valid_pipe[PIPE_LATENCY] && (elem_idx == VECTOR_LEN);
-  assign res_wr_addr= neuron_idx;
-  assign res_wr_data= acc_pipe[PIPE_LATENCY];
+    // external sum
+    logic signed [2*DATA_WIDTH-1:0] sum_reg;
 
-  // Drive BRAM & MAC inputs
-  assign tok_rd_en  = start_pipe[0];
-  assign tok_rd_addr= elem_idx;
-  assign wgt_rd_en  = start_pipe[0];
-  assign wgt_rd_addr= neuron_idx * VECTOR_LEN + elem_idx;
-  assign mac_start  = start_pipe[0];
-  assign mac_a      = tok_rd_data;
-  assign mac_b      = wgt_rd_data;
-  assign mac_acc_in = acc_pipe[PIPE_LATENCY];
-
-  // Single-process sequential block
-  always_ff @(posedge clk or posedge rst) begin
-    if (rst) begin
-      elem_idx    <= 0;
-      neuron_idx  <= 0;
-      done        <= 0;
-      start_pipe  <= '0;
-      valid_pipe  <= '0;
-      // initialize acc feedback pipe
-      for (int i = 0; i <= PIPE_LATENCY; i++)
-        acc_pipe[i] <= '0;
-    end else begin
-      // kick off processing on "start"
-      start_pipe[0] <= start && !busy;
-      for (int i = 1; i <= PIPE_LATENCY; i++) begin
-        start_pipe[i] <= start_pipe[i-1];
-      end
-
-      // shift the valid flag
-      valid_pipe[0] <= mac_valid;
-      for (int i = 1; i <= PIPE_LATENCY; i++) begin
-        valid_pipe[i] <= valid_pipe[i-1];
-      end
-
-      // update accumulator feedback pipeline
-      acc_pipe[0] <= (elem_idx == 0 && start_pipe[0]) ? '0 : mac_acc_out;
-      for (int i = 1; i <= PIPE_LATENCY; i++) begin
-        acc_pipe[i] <= acc_pipe[i-1];
-      end
-
-      // advance index when a valid result comes out
-      if (valid_pipe[PIPE_LATENCY]) begin
-        if (elem_idx + 1 < VECTOR_LEN) begin
-          elem_idx <= elem_idx + 1;
-        end else begin
-          // finished one neuron
-          if (neuron_idx + 1 < NUM_NEURONS) begin
-            neuron_idx <= neuron_idx + 1;
-            elem_idx   <= 0;
-            // clear accumulator for next neuron
-            acc_pipe[0] <= '0;
-          end else begin
-            done <= 1;
-          end
-        end
-      end
+    // Delay COMPUTE -> MAC.start
+    always_ff @(posedge clk or posedge rst) begin
+        if (rst) compute_pipe <= 0;
+        else compute_pipe <= {compute_pipe[BRAM_LATENCY-2:0], state==COMPUTE};
     end
-  end
+    assign mac_start = compute_pipe[BRAM_LATENCY-1];
+
+    // Delay end-of-vector -> align with mac_valid
+    always_ff @(posedge clk or posedge rst) begin
+        if (rst) eov_pipe <= 0;
+        else eov_pipe <= {eov_pipe[TOTAL_LATENCY-2:0], (state==COMPUTE && vec_cnt==VECTOR_LEN-1)};
+    end
+    assign eov_valid = eov_pipe[TOTAL_LATENCY-1] & mac_valid;
+
+    // Pipe BRAM outputs to MAC inputs
+    always_ff @(posedge clk or posedge rst) begin
+        if (rst) begin token_pipe<=0; weight_pipe<=0; end
+        else if (state==COMPUTE) begin token_pipe<=token_rd_data; weight_pipe<=weight_rd_data; end
+    end
+
+    // MAC as pure multiplier
+    MAC #(.WIDTH(DATA_WIDTH)) mac_i (
+        .clk(clk), .rst(rst), .start(mac_start),
+        .a(token_pipe), .b(weight_pipe), .acc_in(0),
+        .acc_out(mac_acc_out), .valid(mac_valid)
+    );
+
+    assign token_rd_addr = rd_addr_reg;
+    assign weight_rd_addr = {neuron_cnt, rd_addr_reg};
+    assign result_wr_addr = neuron_cnt;
+
+    // Main FSM
+    always_ff @(posedge clk or posedge rst) begin
+        if (rst) begin
+            state<=IDLE; busy<=0; vec_cnt<=0; neuron_cnt<=0;
+            rd_addr_reg<=0; token_rd_en<=0; weight_rd_en<=0; result_wr_en<=0;
+            sum_reg<=0;
+        end else begin
+            case(state)
+                IDLE: begin
+                    busy<=0;
+                    if (start) begin
+                        busy<=1; state<=COMPUTE;
+                        vec_cnt<=0; neuron_cnt<=0; rd_addr_reg<=0; sum_reg<=0;
+                    end
+                end
+
+                COMPUTE: begin
+                    token_rd_en<=1; weight_rd_en<=1;
+                    rd_addr_reg<=vec_cnt;
+                    vec_cnt<= (vec_cnt==VECTOR_LEN-1)?0:vec_cnt+1;
+
+                    if (mac_valid) begin
+                        if (eov_pipe[TOTAL_LATENCY-1]) begin
+                            result_wr_en <= 1;
+                            result_wr_data <= sum_reg + mac_acc_out;
+                            sum_reg <= 0;
+                            state <= WRITE;
+                        end else begin
+                            sum_reg <= sum_reg + mac_acc_out;
+                        end
+                    end
+                end
+
+                WRITE: begin
+                    token_rd_en<=0; weight_rd_en<=0; result_wr_en<=0;
+                    if (neuron_cnt==NUM_NEURONS-1)
+                        state<=DONE;
+                    else begin
+                        neuron_cnt<=neuron_cnt+1;
+                        state<=COMPUTE;
+                        vec_cnt<=0; rd_addr_reg<=0; sum_reg<=0;
+                    end
+                end
+
+                DONE: begin
+                    busy<=0;
+                    if (!start) state<=IDLE;
+                end
+            endcase
+        end
+    end
 endmodule
