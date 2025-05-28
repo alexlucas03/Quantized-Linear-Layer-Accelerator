@@ -3,31 +3,45 @@
 #include "verilated_vcd_c.h"
 #include <cstdint>
 #include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
 
-// Simulation time in time steps
 static vluint64_t main_time = 0;
 double sc_time_stamp() { return main_time; }
 
-// Clock toggle and eval
 void tick(Vlayer_top* dut, VerilatedVcdC* tfp) {
-    // Falling edge
     dut->clk = 0;
     dut->eval();
     if (tfp) tfp->dump(main_time++);
-    // Rising edge
     dut->clk = 1;
     dut->eval();
     if (tfp) tfp->dump(main_time++);
 }
 
-// Convert double to Q5.10 fixed
-static constexpr int Q = 10;
-static int32_t to_fixed(double v) {
-    return int32_t(v * (1 << Q));
+std::vector<int16_t> read_values_file(const std::string& filename) {
+    std::vector<int16_t> values;
+    std::ifstream file(filename);
+    std::string line;
+    while (std::getline(file, line)) {
+        if (!line.empty() && line[0] != '#') {
+            values.push_back(static_cast<int16_t>(std::stoi(line)));
+        }
+    }
+    return values;
 }
 
-const int VECTOR_LEN = 16;  // Length of input vector
-const int NUM_NEURONS = 16;   // Number of neurons in the layer
+std::vector<int32_t> read_output_file(const std::string& filename) {
+    std::vector<int32_t> values;
+    std::ifstream file(filename);
+    std::string line;
+    while (std::getline(file, line)) {
+        if (!line.empty() && line[0] != '#') {
+            values.push_back(static_cast<int32_t>(std::stol(line)));
+        }
+    }
+    return values;
+}
 
 int main(int argc, char** argv) {
     Verilated::commandArgs(argc, argv);
@@ -38,7 +52,13 @@ int main(int argc, char** argv) {
     dut->trace(tfp, 2);
     tfp->open("sim/vcd/layer_top_tb.vcd");
 
-    // Initialize inputs
+    auto tokens = read_values_file("token_vals.txt");
+    auto weights = read_values_file("weight_vals.txt");
+    auto expected_outputs = read_output_file("cpu_output.txt");
+
+    int VECTOR_LEN = tokens.size();
+    int NUM_NEURONS = weights.size() / VECTOR_LEN;
+
     dut->clk = 0;
     dut->rst = 1;
     dut->start = 0;
@@ -46,71 +66,68 @@ int main(int argc, char** argv) {
     dut->weight_wr_en = 0;
     dut->result_rd_en = 0;
 
-    // Reset sequence
     for (int i = 0; i < 4; i++) tick(dut, tfp);
     dut->rst = 0;
     tick(dut, tfp);
 
-    // Write token memory: set all tokens to addr
     for (int addr = 0; addr < VECTOR_LEN; addr++) {
         dut->token_wr_en   = 1;
         dut->token_wr_addr = addr;
-        dut->token_wr_data = to_fixed(addr);
+        dut->token_wr_data = tokens[addr];
         tick(dut, tfp);
     }
     dut->token_wr_en = 0;
     tick(dut, tfp);
 
-    // Write weight memory: set all weights to 1.0
     for (int addr = 0; addr < VECTOR_LEN * NUM_NEURONS; addr++) {
         dut->weight_wr_en   = 1;
         dut->weight_wr_addr = addr;
-        dut->weight_wr_data = to_fixed(4.0);
+        dut->weight_wr_data = weights[addr];
         tick(dut, tfp);
     }
     dut->weight_wr_en = 0;
     tick(dut, tfp);
 
-    // Start layer processing
     dut->start = 1;
     tick(dut, tfp);
     dut->start = 0;
 
-    // Wait until done
-    int max_ticks = 1000;  // or another reasonable upper bound
     int tick_count = 0;
-    while (!dut->done && !Verilated::gotFinish() && tick_count < max_ticks) {
+    const int max_ticks = 50000;
+    vluint64_t start_tick = main_time;
+    while (!dut->done && tick_count < max_ticks) {
         tick(dut, tfp);
         tick_count++;
     }
+    vluint64_t end_tick = main_time;
+    std::cout << "Simulation ticks: " << (end_tick - start_tick) << "\\n";
+
     if (tick_count >= max_ticks) {
-        std::cout << "ERROR: Simulation timed out waiting for done signal.\n";
+        std::cout << "ERROR: Simulation timed out.\\n";
     }
 
-    // Read and verify results for each neuron
     bool all_ok = true;
-    const int32_t expected = (VECTOR_LEN * (VECTOR_LEN - 1))/2 * to_fixed(4.0);  // VECTOR_LEN * 1.0
     for (int n = 0; n < NUM_NEURONS; n++) {
         dut->result_rd_en   = 1;
         dut->result_rd_addr = n;
         tick(dut, tfp);
         int32_t result = dut->result_rd_data;
-        if (result != expected) {
+        if (result != expected_outputs[n]) {
             std::cout << "Mismatch at neuron " << n
                       << ": got " << result
-                      << ", expected " << expected << "\n";
+                      << ", expected " << expected_outputs[n] << "\\n";
             all_ok = false;
         }
     }
     dut->result_rd_en = 0;
     tick(dut, tfp);
 
-    if (all_ok) std::cout << "\n*** TEST PASSED: All neuron outputs match expected. ***\n";
-    else        std::cout << "\n*** TEST FAILED: See mismatches above. ***\n";
+    if (all_ok)
+        std::cout << "\\n*** TEST PASSED: All outputs match expected. ***\\n";
+    else
+        std::cout << "\\n*** TEST FAILED: Mismatches found. ***\\n";
 
-    // Final ticks
     for (int i = 0; i < 2; i++) tick(dut, tfp);
-
     tfp->close();
     delete dut;
     delete tfp;
